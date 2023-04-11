@@ -8,10 +8,11 @@
 import Foundation
 
 public enum Metadata: Codable {
+    
     case string(dictionary: [String: String]?)
     case date(dictionary: [String: Date]?)
     case double(dictionary: [String: Double]?)
-
+    
     public var original: [String: Any]? {
         switch self {
         case .string(dictionary: let dictionary):
@@ -23,6 +24,7 @@ public enum Metadata: Codable {
         }
     }
 }
+
 // MARK: - Metadata: ExpressibleByDictionaryLiteral, Equatable
 extension Metadata: ExpressibleByDictionaryLiteral, Equatable {
     public typealias Key = String
@@ -51,6 +53,12 @@ extension Metadata: Payload {
         }
         if let doubleDictionary = dictionary as? [String: Double] {
             return Metadata.double(dictionary: doubleDictionary)
+        }
+        let anyToStringDict = dictionary.mapValues { value in
+            return String(describing: value)
+        }
+        if(!anyToStringDict.isEmpty){
+            return Metadata.string(dictionary: anyToStringDict)
         }
         throw HealthKitError.invalidValue("Invalid dictionary: \(dictionary)")
     }
